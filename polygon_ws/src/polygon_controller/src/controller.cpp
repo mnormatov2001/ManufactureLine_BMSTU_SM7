@@ -31,8 +31,7 @@ std::string ReadFile(const std::string file_path)
   }
   return text;
 }
-
-class Address
+struct Address
 {
 private:
   std::string Ip;
@@ -41,39 +40,26 @@ public:
   std::string GetIp(){return Ip;}
   int GetPort(){return Port;}
   Address(const string ip, const int port) : Ip(ip), Port(port) {}
-  Address(const string json_config, const string name)
-  {
-    auto address = GetAddress(json_config, name);
-    Ip = address.Ip;
-    Port = address.Port;
-  }
+};
 
-  static Address GetAddress(const string json_config_string, const string name)
-  {
-    rapidjson::Document doc;
-    doc.Parse(json_config_string.c_str());
-    rapidjson::Value& val = doc[name.c_str()];
-    return fromJSON(val);
-  }
-
-private:
-  static Address fromJSON(const rapidjson::Value& doc) 
-  {
-    if(!doc.IsObject())
+Address GetAddress(const string json_config_string, const string name)
+{
+  rapidjson::Document doc;
+  doc.Parse(json_config_string.c_str());
+  rapidjson::Value& json_value = doc[name.c_str()];
+  if(!json_value.IsObject())
       throw std::runtime_error("document should be an object");
 
     static const char* members[] = { "ip", "port" };
     for(size_t i = 0; i < sizeof(members)/sizeof(members[0]); i++)
-      if(!doc.HasMember(members[i]))
+      if(!json_value.HasMember(members[i]))
         throw std::runtime_error("missing fields");
         
-    std::string ip(doc["ip"].GetString());
-    int port = doc["port"].GetInt();
+    std::string ip(json_value["ip"].GetString());
+    int port = json_value["port"].GetInt();
     Address result(ip, port);
     return result;
-  }
-};
-
+}
 class Controller_node : public rclcpp::Node
 {
 public:
@@ -84,11 +70,11 @@ public:
     std::string config_string = ReadFile(config_path);
     RCLCPP_INFO(this->get_logger(), "Readed config:\n%s", config_string.c_str());
     
-    Lamp1Address = std::make_shared<Address>(config_string, "Lamp1");
-    Lamp2Address = std::make_shared<Address>(config_string, "Lamp2");
-    Lamp3Address = std::make_shared<Address>(config_string, "Lamp3");
-    AngleManipulatorAddress = std::make_shared<Address>(config_string, "AngleManipulator");
-    PalletizerAddress = std::make_shared<Address>(config_string, "Palletizer");
+    Lamp1Address = std::make_shared<Address>(GetAddress(config_string, "Lamp1"));
+    Lamp2Address = std::make_shared<Address>(GetAddress(config_string, "Lamp2"));
+    Lamp3Address = std::make_shared<Address>(GetAddress(config_string, "Lamp3"));
+    AngleManipulatorAddress = std::make_shared<Address>(GetAddress(config_string, "AngleManipulator"));
+    PalletizerAddress = std::make_shared<Address>(GetAddress(config_string, "Palletizer"));
 
     RCLCPP_INFO(this->get_logger(), "\n\nLamp1 address changed:\nip: '%s'\tport: '%d'\n",
       Lamp1Address->GetIp().c_str(), Lamp1Address->GetPort());
