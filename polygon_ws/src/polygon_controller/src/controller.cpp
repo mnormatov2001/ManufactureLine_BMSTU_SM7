@@ -80,7 +80,7 @@ public:
   Controller_node() : Node("controller")
   {
     std::string config_path(get_current_dir_name());
-    config_path += "/src/poligon_controller/src/config.json";
+    config_path += "/src/polygon_controller/src/config.json";
     std::string config_string = ReadFile(config_path);
     RCLCPP_INFO(this->get_logger(), "Readed config:\n%s", config_string.c_str());
     
@@ -110,6 +110,13 @@ public:
     AngleManipulator->init();
     Palletizer = std::make_shared<PalletizerController>(PalletizerAddress->GetIp(), PalletizerAddress->GetPort());
     Palletizer->init();
+
+    Palletizer->setZone(
+        PalletizerController::Position(0, -300, 160),
+        PalletizerController::Position(300, 300, 290));
+    AngleManipulator->setZone(
+        AngleManipulatorController::Position(0, -300, 0, 0),
+        AngleManipulatorController::Position(300, 300, 150, 90));
 
     Lamp1_subscription = this->create_subscription<interfaces::msg::LampMsg>(
       "Lamp1", 10, std::bind(&Controller_node::lamp1_callback, this, _1));

@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project(poligon_controller)
+project(polygon_controller)
 
 # Default to C99
 if(NOT CMAKE_C_STANDARD)
