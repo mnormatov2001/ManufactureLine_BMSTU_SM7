@@ -7,6 +7,7 @@
 
 using namespace std;
 
+// Класс который реализует интерфейс управления угловым манипулятором
 class AngleManipulatorController : public UDPSocket {
 public:
   struct Position {

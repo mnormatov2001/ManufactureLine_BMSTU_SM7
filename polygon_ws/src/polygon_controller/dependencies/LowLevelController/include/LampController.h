@@ -7,6 +7,7 @@
 
 using namespace std;
 
+// Класс который реализует интерфейс лампой
 class LampController : public UDPSocket {
 private:
   bool redCurrState;

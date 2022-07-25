@@ -7,6 +7,7 @@
 
 using namespace std;
 
+// Класс который реализует интерфейс управления манипулятором "паллетайзер"
 class PalletizerController : public UDPSocket {
 public:
   struct Position {

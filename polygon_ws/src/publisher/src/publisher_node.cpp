@@ -9,9 +9,7 @@
 
 using namespace std::chrono_literals;
 
-/* This example creates a subclass of Node and uses std::bind() to register a
- * member function as a callback from the timer. */
-
+// Тестовый "Publisher" (для теста пакета polygon_controller)
 class Publisher_node : public rclcpp::Node
 {
 public:
@@ -23,14 +21,14 @@ public:
     Lamp3Publisher = this->create_publisher<interfaces::msg::LampMsg>("Lamp3", 10);
     AngleManipulatorPublisher = this->create_publisher<interfaces::msg::AngleManipulatorMsg>("AngleManipulator", 10);
     PalletizerPublisher = this->create_publisher<interfaces::msg::PalletizerMsg>("Palletizer", 10);
-    timer_ = this->create_wall_timer(
-      300ms, std::bind(&Publisher_node::timer_callback, this));
+    Lamp_timer = this->create_wall_timer(
+      300ms, std::bind(&Publisher_node::lamp_timer_callback, this));
     demo_timer = this->create_wall_timer(
       3000ms, std::bind(&Publisher_node::demo_timer_callback, this));
   }
 
 private:
-  void timer_callback()
+  void lamp_timer_callback()
   {
     auto msg = interfaces::msg::LampMsg();
 
@@ -43,7 +41,7 @@ private:
     if(count_ % 4 == 3)
       msg.green = count_;
     count_++;
-    RCLCPP_INFO(this->get_logger(), "Publishing:\nRed:\t'%d'\nOrange:\t'%d'\nBlue\t'%d'\nGreen\t'%d'", 
+    RCLCPP_INFO(this->get_logger(), "Publishing:\nLamps state:\nRed:\t'%d'\nOrange:\t'%d'\nBlue\t'%d'\nGreen\t'%d'", 
     msg.red, msg.orange, msg.blue, msg.green);
 
     Lamp1Publisher->publish(msg);
@@ -84,7 +82,7 @@ private:
   }
   int X = 0;
   int Y = 0;
-  rclcpp::TimerBase::SharedPtr timer_;
+  rclcpp::TimerBase::SharedPtr Lamp_timer;
   rclcpp::TimerBase::SharedPtr demo_timer;
   rclcpp::Publisher<interfaces::msg::LampMsg>::SharedPtr Lamp1Publisher;
   rclcpp::Publisher<interfaces::msg::LampMsg>::SharedPtr Lamp2Publisher;

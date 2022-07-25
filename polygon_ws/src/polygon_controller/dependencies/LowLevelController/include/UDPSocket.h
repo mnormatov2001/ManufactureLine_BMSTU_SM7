@@ -12,6 +12,7 @@
 
 using namespace std;
 
+// Класс который реализует подключение и отправки данных по UDP сокуту
 class UDPSocket {
 private:
   struct sockaddr_in addr;
